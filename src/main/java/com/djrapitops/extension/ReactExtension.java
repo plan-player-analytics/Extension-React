@@ -22,22 +22,44 @@
 */
 package com.djrapitops.extension;
 
+import com.djrapitops.plan.extension.CallEvents;
 import com.djrapitops.plan.extension.DataExtension;
 import com.djrapitops.plan.extension.annotation.PluginInfo;
+import com.djrapitops.plan.extension.annotation.TableProvider;
 import com.djrapitops.plan.extension.icon.Color;
 import com.djrapitops.plan.extension.icon.Family;
+import com.djrapitops.plan.extension.icon.Icon;
+import com.djrapitops.plan.extension.table.Table;
+import com.volmit.react.React;
+import com.volmit.react.api.RAIEvent;
+import primal.lang.collection.GList;
 
 /**
  * DataExtension.
  *
  * @author AuroraLS3
  */
-@PluginInfo(name = "", iconName = "", iconFamily = Family.SOLID, color = Color.NONE)
-public class NewExtension implements DataExtension {
+@PluginInfo(name = "React", iconName = "react", iconFamily = Family.BRAND, color = Color.LIGHT_BLUE)
+public class ReactExtension implements DataExtension {
 
-    public NewExtension() {
-        // TODO Add required API classes
+    public ReactExtension() {
     }
 
-    // TODO Add Provider methods
+    @Override
+    public CallEvents[] callExtensionMethodsOn() {
+        return new CallEvents[]{CallEvents.SERVER_EXTENSION_REGISTER, CallEvents.SERVER_PERIODICAL};
+    }
+
+    @TableProvider
+    public Table reactActions() {
+        Table.Factory table = Table.builder()
+                .columnOne("React Action", Icon.called("react").of(Family.BRAND).build());
+
+        GList<RAIEvent> events = React.instance().getReact().raiController.getRai().getEvents();
+        for (RAIEvent event : events) {
+            String[] parameters = event.getPars();
+            table.addRow(event.getType().formatFor(parameters.length, parameters));
+        }
+        return table.build();
+    }
 }
